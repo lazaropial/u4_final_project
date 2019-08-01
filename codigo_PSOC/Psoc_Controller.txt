@@ -1,0 +1,208 @@
+#include "project.h"
+#include "string.h"
+#include "stdio.h"
+#include "string.h"
+#include "stdlib.h"
+
+#define StringToPrint_SIZE 32
+char StringToPrint[StringToPrint_SIZE];
+ 
+int value_counter=0;        //variable para lectura del timer
+int con= 0; 
+int PWM = 0; 
+int para = 0;
+int comp = 0;
+int dataIn = 0;
+int robot_state;
+int state; 
+int i=0;
+
+float distancia=0.0;        //variable para la conversion a distancia en cm
+
+char imp[9];                // variable de publicacion
+char data[2];
+char string[3];
+char dato_lit_car; 
+
+enum{
+    AUTOMATICO,
+    MANUAL,
+    TURN
+};
+
+void Forward(){
+    //PWM = 50; 
+    PWM_WriteCompare1(PWM);  
+    PWM_1_WriteCompare1(PWM);
+    PWM_2_WriteCompare1(PWM); 
+    PWM_3_WriteCompare1(PWM);
+        
+    PWM_WriteCompare2(0);
+    PWM_1_WriteCompare2(0);
+    PWM_2_WriteCompare2(0);
+    PWM_3_WriteCompare2(0);
+}
+
+void Backward(){
+    PWM_WriteCompare1(0);  
+    PWM_1_WriteCompare1(0);
+    PWM_2_WriteCompare1(0); 
+    PWM_3_WriteCompare1(0);
+        
+    PWM_WriteCompare2(PWM);
+    PWM_1_WriteCompare2(PWM);
+    PWM_2_WriteCompare2(PWM);
+    PWM_3_WriteCompare2(PWM);
+}
+
+void GoRight(){
+     PWM_WriteCompare1(PWM);
+     PWM_2_WriteCompare1(0);
+     PWM_1_WriteCompare1(0);
+     PWM_3_WriteCompare1(PWM);
+         
+     PWM_WriteCompare2(0);
+     PWM_2_WriteCompare2(PWM);
+     PWM_1_WriteCompare2(PWM);
+     PWM_3_WriteCompare2(0);   
+}
+
+void GoLeft(){
+     PWM_WriteCompare1(0);
+     PWM_2_WriteCompare1(PWM);
+     PWM_1_WriteCompare1(PWM);
+     PWM_3_WriteCompare1(0);
+         
+     PWM_WriteCompare2(PWM);
+     PWM_2_WriteCompare2(0);
+     PWM_1_WriteCompare2(0);
+     PWM_3_WriteCompare2(PWM);   
+}
+
+void Turn(){
+    PWM_WriteCompare1(PWM);
+    PWM_1_WriteCompare1(PWM);
+    PWM_2_WriteCompare1(0);
+    PWM_3_WriteCompare1(0);
+         
+    PWM_WriteCompare2(0);
+    PWM_1_WriteCompare2(0);
+    PWM_2_WriteCompare2(PWM);
+    PWM_3_WriteCompare2(PWM);
+}
+ 
+void Stop(){
+    PWM_WriteCompare1(0);
+    PWM_1_WriteCompare1(0);
+    PWM_2_WriteCompare1(0);
+    PWM_3_WriteCompare1(0);
+
+    PWM_WriteCompare2(0);
+    PWM_1_WriteCompare2(0); 
+    PWM_2_WriteCompare2(0); 
+    PWM_3_WriteCompare2(0);  
+}
+
+int main(void) {
+    
+    CyGlobalIntEnable;      //habilitación de interrupciones globales
+    
+    Timer_Start();          //Inicialización del timer
+    QuadDec_Start();
+    
+    UART_Start();
+    UART_Enable(); 
+    
+    PWM_Start();
+    PWM_Enable();
+    PWM_1_Start();
+    PWM_1_Enable();    
+    PWM_2_Start();
+    PWM_2_Enable();   
+    PWM_3_Start();
+    PWM_3_Enable();
+ 
+    for(;;)
+    {
+        if(dataIn <= 3){
+            dato_lit_car = UART_GetChar();
+        if(dato_lit_car != ' '){
+            string[dataIn] = dato_lit_car;
+            dataIn++;}
+        }   
+        else {
+            UART_PutString(string);
+            dataIn=0;
+        }
+        
+        if (string[1] == 'w') {
+            robot_state=MANUAL; 
+        }
+        if (string[1] == 'e') {
+            robot_state=AUTOMATICO; 
+        }
+        if (robot_state == MANUAL) {
+            Stop(); 
+        }
+        if (string[1] == 'a' && robot_state==MANUAL) {
+           Forward();   
+        }
+        if (string[1] == 'b' && robot_state==MANUAL) {
+            Backward();    
+        }
+        if (string[1] == 'c' && robot_state==MANUAL) { 
+            GoLeft(); 
+        }
+        if (string[1] == 'd' && robot_state==MANUAL) {
+            GoRight(); 
+        }                                                           
+        if (string[1] == 's') {
+            Stop();  
+        }
+//////////////////////////////////////PWM//////////////////////////////////////////////////////    
+        if(string[1] == '+') {               
+            PWM = PWM + 1;
+            if(PWM >= 255)
+                PWM = 255;
+        }
+        if(string[1] == '-') {               
+            PWM = PWM - 1;
+            if(PWM <= 30)
+                PWM = 30;
+        }
+///////////////////////////////////////Read Ultrasonic //////////////////////////////////////////    
+
+        while(echo_Read()==0)//condición de espera para implementar la secuencia de inicio
+        {
+            Trigger_out_Write(1);//activar en 1 lógico la salida al pin trigg y el reinicio del timer
+            CyDelay(10u);        //Espera de 10uS para la activación de envío de ráfagas
+            Trigger_out_Write(0);//Desactivar el pin trigg generando así el pulso de entrada
+            CyDelay(1);          //Espera necesaria para que el módulo envíe la rafaga de ondas ultrasonicas
+        }
+        while(echo_Read()== 1) {}; //Espera entre los dos estados del pin echo, activo y inactivo (El timer funciona en todo este tiempo)
+        
+        value_counter = 65535-Timer_ReadCounter();//Lectura del timer y conversion de descendente a ascendente
+        
+        distancia = value_counter / 58.0 ;        //Conversión directa de microsegundos a distancia en cm
+        
+        sprintf(imp,"%.1f cm  ",distancia);       //Conversion de variable float a char para su publicación
+        
+        con = QuadDec_GetCounter()*(-1);
+        con = con -1;
+             
+        if (distancia >= 30 && robot_state==AUTOMATICO) {
+            robot_state=AUTOMATICO; 
+            Forward();
+            
+        }
+        else {
+            con = 0; 
+        }    
+        if (con>=1 && i<20) {
+            Turn(); 
+        } 
+        else {
+           con = 0;  
+        }  
+    } 
+}

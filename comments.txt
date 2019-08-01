@@ -1,0 +1,69 @@
+For the exam we use files exported from solidworks. 
+Note: check the folder Auxiliars. 
+
+Procedure:
+                              Calculations of the motors
+ 
+To calculate  the max velocity we take from the datasheet the value of 240 RPM that belong of the 6 volts motor, 
+and we convert it on rad/s, as shown below: 
+
+    240 RPM to rad/s
+
+    2pi
+   ----- (240 RPM) = 25.132741199999998 rad/s
+    60
+
+To calculate  the max Torque we take from the datasheet the value of 5500 mg*cm that belong of the 6 volts motor, 
+and we convert it on Nm, as shown below:
+
+   5500mg*cm to Nm
+
+    1 g*cm = 0.0000980665 Nm
+
+    (5.5 g*cm)(0.0000980665 Nm)
+   ------------------- =   0.00053936575 Nm
+             1 g*cm
+
+
+                                          Encoder 
+
+The encoder has 20 clicks so that means that 20 clicks is equal to 360 degrees. 
+
+                     2pi
+      Resolution =  -----  = 0.3141592654 
+                     20
+
+
+                                        lookuptable
+
+  I take from the datasheet the value of 0.3 cm of resolution, and do the shown belog: 
+
+     0       0    0                     500 cm - 2 cm                
+    0.2      0    0                    -----------------   = 1660
+     5      1660  0                         0.3 cm 
+
+
+  The range of operation is from 2 cm  to 500 cm. 
+
+
+////////////////////////////////////////////////
+for the code
+
+We create 2 diferent .h one is for calculate the velocity of the robot and the second one is for to obatain the distance of the distance sensor,
+then we use 2 states for this project (manual and autonomous), and we created the funtions for all the movements.
+
+line 106 to 124: we create the the conditions for turn right and left depending on which sensor sens the obstacule.
+
+line 128 to 150: we put the funtion for webots devices.
+
+
+
+
+ 
+
+
+
+
+
+
+

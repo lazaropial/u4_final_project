@@ -74,20 +74,19 @@ void rightRobot(WbDeviceTag wheel1,WbDeviceTag wheel2,WbDeviceTag wheel3,
 
 void turnRightRobot(WbDeviceTag wheel1,WbDeviceTag wheel2,WbDeviceTag wheel3,
                     WbDeviceTag wheel4) {
-  wb_motor_set_velocity(wheel1, -VELOCITY);
-  wb_motor_set_velocity(wheel2, VELOCITY);
-  wb_motor_set_velocity(wheel3, -VELOCITY);
-  wb_motor_set_velocity(wheel4, VELOCITY);
+  wb_motor_set_velocity(wheel1, -0.785398);
+  wb_motor_set_velocity(wheel2, 0.785398);
+  wb_motor_set_velocity(wheel3, -0.785398);
+  wb_motor_set_velocity(wheel4, 0.785398);
 }
 
 void turnLeftRobot(WbDeviceTag wheel1,WbDeviceTag wheel2,WbDeviceTag wheel3,
                    WbDeviceTag wheel4) {
-  wb_motor_set_velocity(wheel1, VELOCITY);
-  wb_motor_set_velocity(wheel2, -VELOCITY);
-  wb_motor_set_velocity(wheel3, VELOCITY);
-  wb_motor_set_velocity(wheel4, -VELOCITY);
+  wb_motor_set_velocity(wheel1, 0.785398);
+  wb_motor_set_velocity(wheel2, -0.785398);
+  wb_motor_set_velocity(wheel3, 0.785398);
+  wb_motor_set_velocity(wheel4, -0.785398);
 }
-
 
 void autonomousMode (WbDeviceTag wheel1,WbDeviceTag wheel2,WbDeviceTag wheel3,
                      WbDeviceTag wheel4,WbDeviceTag ds_l, WbDeviceTag ds_r) {
@@ -96,18 +95,18 @@ void autonomousMode (WbDeviceTag wheel1,WbDeviceTag wheel2,WbDeviceTag wheel3,
   right_distance_sensor=chekingForObstacle(right_distance_sensor,ds_r);
 
   wb_motor_set_position(wheel1, INFINITY);
-  wb_motor_set_velocity(wheel1, -5.2);
+  wb_motor_set_velocity(wheel1, -5.5);
   wb_motor_set_position(wheel2, INFINITY);
-  wb_motor_set_velocity(wheel2, -5.2);
+  wb_motor_set_velocity(wheel2, -5.5);
   wb_motor_set_position(wheel3, INFINITY);
-  wb_motor_set_velocity(wheel3, -5.2);
+  wb_motor_set_velocity(wheel3, -5.5);
   wb_motor_set_position(wheel4, INFINITY);
-  wb_motor_set_velocity(wheel4, -5.2);
+  wb_motor_set_velocity(wheel4, -5.5);
 
   if (right_distance_sensor<=0.17&&right_distance_sensor<left_distance_sensor) {
   veces++;
   }
-  if (veces>=1 && veces<=26) {
+  if (veces>=1 && veces<=137) {
   turnRightRobot(wheel1, wheel2, wheel3,wheel4);
   veces++;
   } else {
@@ -117,7 +116,7 @@ void autonomousMode (WbDeviceTag wheel1,WbDeviceTag wheel2,WbDeviceTag wheel3,
   if (left_distance_sensor<0.17&&left_distance_sensor<right_distance_sensor) {
   veces2++;
   }
-  if (veces2>=1 && veces2<=26) {
+  if (veces2>=1 && veces2<=149) {
   turnLeftRobot(wheel1, wheel2, wheel3,wheel4);
   veces2++;
   } else {

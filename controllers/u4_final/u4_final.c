@@ -21,7 +21,6 @@
 #define PI 3.1416
 #define VELOCITY 4
 
-
 enum {
   AUTOMATIC,
   MANUAL
@@ -31,11 +30,7 @@ double left_distance_sensor,right_distance_sensor,vel_robot;
 int veces, veces2=0;
 short int robot_state;
 int paro;
-
-
-/////variables para la velocidad lineal
-//velocidad lineal por llanta
-double robot_velocity; //velocidad lineal del robot
+double robot_velocity;
 
 void stopRobot(WbDeviceTag wheel1,WbDeviceTag wheel2,WbDeviceTag wheel3,
                WbDeviceTag wheel4) {
@@ -46,7 +41,7 @@ void stopRobot(WbDeviceTag wheel1,WbDeviceTag wheel2,WbDeviceTag wheel3,
 }
 
 void forwardRobot(WbDeviceTag wheel1,WbDeviceTag wheel2,WbDeviceTag wheel3,
-         WbDeviceTag wheel4) {
+                  WbDeviceTag wheel4) {
   wb_motor_set_velocity(wheel1, -VELOCITY);
   wb_motor_set_velocity(wheel2, -VELOCITY);
   wb_motor_set_velocity(wheel3, -VELOCITY);
@@ -94,22 +89,22 @@ void turnLeftRobot(WbDeviceTag wheel1,WbDeviceTag wheel2,WbDeviceTag wheel3,
 }
 
 
-void autonomousMode (WbDeviceTag wheel1,WbDeviceTag wheel2,WbDeviceTag wheel3,WbDeviceTag wheel4,
-            WbDeviceTag ds_l, WbDeviceTag ds_r) {
+void autonomousMode (WbDeviceTag wheel1,WbDeviceTag wheel2,WbDeviceTag wheel3,
+                     WbDeviceTag wheel4,WbDeviceTag ds_l, WbDeviceTag ds_r) {
 
   left_distance_sensor=chekingForObstacle(left_distance_sensor,ds_l);
   right_distance_sensor=chekingForObstacle(right_distance_sensor,ds_r);
 
   wb_motor_set_position(wheel1, INFINITY);
-  wb_motor_set_velocity(wheel1, -VELOCITY);
+  wb_motor_set_velocity(wheel1, -5.2);
   wb_motor_set_position(wheel2, INFINITY);
-  wb_motor_set_velocity(wheel2, -VELOCITY);
+  wb_motor_set_velocity(wheel2, -5.2);
   wb_motor_set_position(wheel3, INFINITY);
-  wb_motor_set_velocity(wheel3, -VELOCITY);
+  wb_motor_set_velocity(wheel3, -5.2);
   wb_motor_set_position(wheel4, INFINITY);
-  wb_motor_set_velocity(wheel4, -VELOCITY);
+  wb_motor_set_velocity(wheel4, -5.2);
 
-  if (right_distance_sensor<=0.4&&right_distance_sensor<left_distance_sensor) {
+  if (right_distance_sensor<=0.17&&right_distance_sensor<left_distance_sensor) {
   veces++;
   }
   if (veces>=1 && veces<=26) {
@@ -117,8 +112,9 @@ void autonomousMode (WbDeviceTag wheel1,WbDeviceTag wheel2,WbDeviceTag wheel3,Wb
   veces++;
   } else {
   veces=0;
-  }
-  if (left_distance_sensor<0.4&&left_distance_sensor<right_distance_sensor) {
+}
+
+  if (left_distance_sensor<0.17&&left_distance_sensor<right_distance_sensor) {
   veces2++;
   }
   if (veces2>=1 && veces2<=26) {
@@ -126,7 +122,7 @@ void autonomousMode (WbDeviceTag wheel1,WbDeviceTag wheel2,WbDeviceTag wheel3,Wb
   veces2++;
   } else {
   veces2=0;
-  }
+}
 }
 
 int main(int argc, char **argv) {
@@ -202,7 +198,7 @@ int main(int argc, char **argv) {
       turnRightRobot(wheel1,wheel2,wheel3,wheel4);
     }
 
-    printf("vel=%f\n",robot_velocity);
+    printf("vel=%f m/s\n",robot_velocity);
 
     };
 
